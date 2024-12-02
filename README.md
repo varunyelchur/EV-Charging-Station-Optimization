@@ -17,7 +17,7 @@ Data
 Open Charge Map dataset of global electric vehicle charging station data, specifically the latitude and longitude of the stations. https://openchargemap.org/site : https://github.com/openchargemap/ocm-data
 
 Tools:
-We will use C++, Clion, and Github in our project, for the UI maybe SFML.
+We will use Python, Pycharm, and Github in our project, for the UI maybe SFML.
 
 Visuals
 
