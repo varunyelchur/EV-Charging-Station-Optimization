@@ -18,7 +18,7 @@ Open Charge Map dataset of global electric vehicle charging station data, specif
 
 Tools:
 We will use C++, Clion, and Github in our project, for the UI maybe SFML.
-We will use Djkstra's algorithm to find the shortest and optimal path in our graph
+We will use Djkstra's algorithm to find the shortest and optimal path in our graph.
 
 Visuals
 
