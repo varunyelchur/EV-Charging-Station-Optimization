@@ -2,10 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "EV_Charging_Station_Optimization.exe"
-		},
-		{
-			"path" : "EV_Charging_Station_Optimization.pdb"
+			"path" : "EV_Charging_Station_Optimization"
 		}
 	],
 	"backtrace" : 1,
@@ -38,7 +35,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-g -fdiagnostics-color=always"
+					"fragment" : "-g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.1.sdk -fcolor-diagnostics"
 				}
 			],
 			"language" : "CXX",
@@ -68,16 +65,12 @@
 			{
 				"fragment" : "",
 				"role" : "flags"
-			},
-			{
-				"fragment" : "-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32",
-				"role" : "libraries"
 			}
 		],
 		"language" : "CXX"
 	},
 	"name" : "EV_Charging_Station_Optimization",
-	"nameOnDisk" : "EV_Charging_Station_Optimization.exe",
+	"nameOnDisk" : "EV_Charging_Station_Optimization",
 	"paths" : 
 	{
 		"build" : ".",

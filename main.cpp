@@ -9,67 +9,52 @@
 
 using namespace std;
 
-// Earth's radius in km
-const double EARTH_RADIUS_KM = 6371.0;
+const double earthR = 6371.0;
 
-// Function to calculate the Haversine distance between two coordinates
-double haversine(double lat1, double lon1, double lat2, double lon2) {
-    // Convert degrees to radians
+double haversine(double latitude, double longitude, double latitude_two, double longitude_two) {
     const double DEG_TO_RAD = M_PI / 180.0;
-    lat1 *= DEG_TO_RAD;
-    lon1 *= DEG_TO_RAD;
-    lat2 *= DEG_TO_RAD;
-    lon2 *= DEG_TO_RAD;
-
-    // Haversine formula
-    double dlat = lat2 - lat1;
-    double dlon = lon2 - lon1;
-
+    latitude *= DEG_TO_RAD;
+    longitude *= DEG_TO_RAD;
+    latitude_two *= DEG_TO_RAD;
+    longitude_two *= DEG_TO_RAD;
+    double dlat = latitude_two - latitude;
+    double dlon = longitude_two - longitude;
     double a = sin(dlat / 2) * sin(dlat / 2) +
-               cos(lat1) * cos(lat2) *
+               cos(latitude) * cos(latitude_two) *
                sin(dlon / 2) * sin(dlon / 2);
-
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    double distance = EARTH_RADIUS_KM * c;
-
+    double distance = earthR * c;
     return distance;
 }
 
 // Struct to represent a node in the graph
 struct Node {
-    //unique to each node
     int id;
     double latitude;
     double longitude;
-    //us state abbreviation
     string stateOrProvince;
-    //id and dist
     vector<pair<int, double>> neighbors;
 };
 
 // Function to build the graph
 void buildGraph(const vector<Node>& nodes, double thresholdDistance, unordered_map<int, Node>& graph) {
     int numNodes = nodes.size();
+    int edgeCount = 0;
+    cout << "Building graph with threshold distance: " << thresholdDistance << " km" << endl;
 
-    // Build the graph
     for (int i = 0; i < numNodes; i++) {
         Node node = nodes[i];
-
         for (int j = i + 1; j < numNodes; j++) {
             Node otherNode = nodes[j];
-
-            // Calculate the distance between nodes
             double distance = haversine(node.latitude, node.longitude, otherNode.latitude, otherNode.longitude);
-
-            // If the distance is within the threshold, add an edge
             if (distance <= thresholdDistance) {
                 graph[node.id].neighbors.push_back({otherNode.id, distance});
                 graph[otherNode.id].neighbors.push_back({node.id, distance});
+                edgeCount++;
             }
         }
     }
 }
-
 //go through input and discard quoted sections
 vector<string> parseCSVLine(const string& line) {
     vector<string> result;
@@ -94,6 +79,52 @@ vector<string> parseCSVLine(const string& line) {
     }
     result.push_back(field);
     return result;
+}
+
+//Djikstr'a Alg
+pair<int, double> dijkstra_alg(int Id, const unordered_map<int, Node>& graph) {
+    unordered_map<int, double> dist;
+    vector<int> Ids;
+    dist[Id] = 0.0;
+    for (auto it = graph.begin(); it != graph.end(); ++it) {
+        int node = it->first;
+        Ids.push_back(node);
+        dist[node] = numeric_limits<double>::infinity();
+    }
+
+    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
+    pq.push({0.0, Id});
+    while (!pq.empty()) {
+        pair<double, int> top = pq.top();
+        double currDist = top.first;
+        int currNode = top.second;
+        pq.pop();
+        if (!(currDist > dist[currNode])) {
+            const auto& neighbors = graph.at(currNode).neighbors;
+            for (int i = 0; i < static_cast<int>(neighbors.size()); ++i) {
+                int neighbor = neighbors[i].first;
+                double weight = neighbors[i].second;
+                double newDist = currDist + weight;
+
+                if (newDist < dist[neighbor]) {
+                    dist[neighbor] = newDist;
+                    pq.push({newDist, neighbor});
+                }
+            }
+        }
+    }
+    int farthestNodeId = -1;
+    double maxDistance = 0.0;
+    for (int i = 0; i < static_cast<int>(Ids.size()); ++i) {
+        int nodeId = Ids[i];
+        double distance = dist[nodeId];
+        if (distance > maxDistance && distance < numeric_limits<double>::infinity()) {
+            maxDistance = distance;
+            farthestNodeId = nodeId;
+        }
+    }
+
+    return {farthestNodeId, maxDistance};
 }
 
 int main() {
@@ -279,10 +310,38 @@ int main() {
                 // Break inner loop to rebuild graph with new state
                 break;
             } else if (choice == 2) {
-                // Find best location
-                cout << "this is the best location" << endl;
+                if (nodes.empty()) {
+                    cout << "No nodes available in the graph!" << endl;
+                } else {
+                    int sourceId = -1;
+                    for (int i = 0; i < nodes.size(); ++i) {
+                        if (!graph.at(nodes[i].id).neighbors.empty()) {
+                            sourceId = nodes[i].id;
+                            break;
+                        }
+                    }
+                    if (sourceId == -1) {
+                        cout << "No suitable source node with neighbors found!" << endl;
+                        return 0;
+                    }
 
-            } else if (choice == 3) {
+                    cout << "Using source node: " << sourceId << endl;
+
+                    // Call the updated Dijkstra's function
+                    pair<int, double> result = dijkstra_alg(sourceId, graph);
+
+                    // Display the results
+                    if (result.first != -1) {
+                        cout << "The farthest node from node " << sourceId
+                             << " is node " << result.first
+                             << " with a distance of " << result.second << " km." << endl;
+                    }
+                    else {
+                        cout << "No reachable nodes found from the source node." << endl;
+                    }
+                }
+            }
+            else if (choice == 3) {
                 // Exit
                 running = false;
                 cout << "Exiting" << endl;
