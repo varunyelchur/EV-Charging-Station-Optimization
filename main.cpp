@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <queue>
 #include <unordered_map>
 #include <unordered_set>
 #include <algorithm>
@@ -125,6 +126,60 @@ pair<int, double> dijkstra_alg(int Id, const unordered_map<int, Node>& graph) {
     }
 
     return {farthestNodeId, maxDistance};
+}
+
+// A* Search Algorithm
+pair<int, double> aStarAlg(int startID, unordered_map<int, Node>& graph ){
+    unordered_map<int, double> costFromStart;
+    unordered_map<int, double> totalCost;
+
+    for (auto it = graph.begin(); it != graph.end(); ++it) {
+        int nodeId = it->first;
+        costFromStart[nodeId] = numeric_limits<double>::infinity();
+        totalCost[nodeId] = numeric_limits<double>::infinity();
+    }
+    costFromStart[startID] = 0.0;
+    totalCost[startID] = 0.0;
+    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
+    pq.push({0.0, startID});
+
+    int farthestNode = -1;
+    double maxDistance = 0;
+
+    while (!pq.empty()) {
+        pair<double, int> top = pq.top();
+        double currDist = top.first;
+        int currNode = top.second;
+        pq.pop();
+
+        if (currDist > totalCost[currNode]) {
+            continue;
+        }
+
+        vector<pair<int, double>>& neighbors = graph[currNode].neighbors;
+        for(size_t i =0; i < neighbors.size(); i++){
+            int neighborsID = neighbors[i].first;
+            double edgeWeight = neighbors[i].second;
+            double newDistance = costFromStart[currNode] + edgeWeight;
+            double heuristic =  haversine(graph[neighborsID].latitude, graph[neighborsID].longitude, graph[startID].latitude, graph[startID].longitude);
+
+            if(newDistance< costFromStart[neighborsID]){
+                costFromStart[neighborsID] = newDistance;
+                totalCost[neighborsID] = newDistance + heuristic;
+                pq.push(pair<double, int>(totalCost[neighborsID], neighborsID));
+                if (newDistance > maxDistance) {
+                    maxDistance = newDistance;
+                    farthestNode = neighborsID;
+                }
+
+            }
+        }
+    }
+    if (farthestNode == -1) {
+        return pair<int, double>(-1, numeric_limits<double>::infinity());
+    }
+
+    return pair<int, double>(farthestNode, maxDistance);
 }
 
 int main() {
@@ -296,8 +351,9 @@ int main() {
         while (true) {
             cout << "\nMenu:" << endl;
             cout << "1. Change state" << endl;
-            cout << "2. Find best location for new node" << endl;
-            cout << "3. Exit" << endl;
+            cout << "2. Find best location for new node using Dijkstra's algorithm" << endl;
+            cout << "3. Find best location for new node using A* Search Algorithm" << endl;
+            cout << "4. Exit" << endl;
             cout << "Enter your choice: ";
             int choice;
             cin >> choice;
@@ -342,6 +398,34 @@ int main() {
                 }
             }
             else if (choice == 3) {
+                if (nodes.empty()) {
+                    cout << "No nodes available in the graph!" << endl;
+                }
+                else{
+                    int sourceID = -1;
+                    for (int i = 0; i < nodes.size(); i++) {
+                        if (!graph.at(nodes[i].id).neighbors.empty()) {
+                            sourceID = nodes[i].id;
+                            break;
+                        }
+                    }
+                    if (sourceID == -1) {
+                        cout << "No suitable source node with neighbors found!" << endl;
+                        return 0;
+                    }
+
+                    cout << "Using source node: " << sourceID << endl;
+                    pair<int, double> result = aStarAlg(sourceID, graph);
+                    if (result.first != -1) {
+                        cout << "The farthest node from node " << sourceID << " is node " << result.first << " with a distance of " << result.second  << " km." << endl;
+
+                    }
+                    else {
+                        cout << "No reachable nodes found from the source node." << endl;
+                    }
+                }
+            }
+            else if (choice == 4) {
                 // Exit
                 running = false;
                 cout << "Exiting" << endl;

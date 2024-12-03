@@ -1,1 +1,3 @@
-/usr/bin/c++ -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.o -o EV_Charging_Station_Optimization 
+"C:\Program Files\JetBrains\CLion 2023.3.2\bin\cmake\win\x64\bin\cmake.exe" -E rm -f CMakeFiles\EV_Charging_Station_Optimization.dir/objects.a
+C:\mingw64\bin\ar.exe qc CMakeFiles\EV_Charging_Station_Optimization.dir/objects.a @CMakeFiles\EV_Charging_Station_Optimization.dir\objects1.rsp
+C:\mingw64\bin\c++.exe -g -Wl,--whole-archive CMakeFiles\EV_Charging_Station_Optimization.dir/objects.a -Wl,--no-whole-archive -o EV_Charging_Station_Optimization.exe -Wl,--out-implib,libEV_Charging_Station_Optimization.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\EV_Charging_Station_Optimization.dir\linkLibs.rsp
