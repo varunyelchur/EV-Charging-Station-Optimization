@@ -86,12 +86,12 @@ vector<string> parseCSVLine(const string& line) {
 pair<int, double> dijkstra_alg(int Id, const unordered_map<int, Node>& graph) {
     unordered_map<int, double> dist;
     vector<int> Ids;
-    dist[Id] = 0.0;
     for (auto it = graph.begin(); it != graph.end(); ++it) {
         int node = it->first;
         Ids.push_back(node);
         dist[node] = numeric_limits<double>::infinity();
     }
+    dist[Id] = 0.0;
 
     priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
     pq.push({0.0, Id});
@@ -129,7 +129,7 @@ pair<int, double> dijkstra_alg(int Id, const unordered_map<int, Node>& graph) {
 }
 
 // A* Search Algorithm
-pair<int, double> aStarAlg(int startID, unordered_map<int, Node>& graph ){
+/*pair<int, double> aStarAlg(int startID, unordered_map<int, Node>& graph ){
     unordered_map<int, double> costFromStart;
     unordered_map<int, double> totalCost;
 
@@ -180,7 +180,105 @@ pair<int, double> aStarAlg(int startID, unordered_map<int, Node>& graph ){
     }
 
     return pair<int, double>(farthestNode, maxDistance);
+}*/
+/*
+pair<int, double> bellman_ford(int sourceId, const unordered_map<int, Node>& graph) {
+    unordered_map<int, double> dist;
+    vector<int> Ids;
+
+    // Initialize distances to all nodes as infinity and collect node IDs
+    for (const auto& it : graph) {
+        int nodeId = it.first;
+        Ids.push_back(nodeId);
+        dist[nodeId] = numeric_limits<double>::infinity();
+    }
+    dist[sourceId] = 0.0;  // Distance to the source is zero
+
+    int V = graph.size();
+
+    // Relax edges repeatedly (up to V - 1 times)
+    for (int i = 0; i < V - 1; ++i) {
+        bool updated = false;
+        for (const auto& it : graph) {
+            int u = it.first;
+            const auto& neighbors = it.second.neighbors;
+            for (const auto& neighbor : neighbors) {
+                int v = neighbor.first;
+                double weight = neighbor.second;
+                if (dist[u] != numeric_limits<double>::infinity() && dist[u] + weight < dist[v]) {
+                    dist[v] = dist[u] + weight;
+                    updated = true;
+                }
+            }
+        }
+        if (!updated) {
+            break; // Early termination if no updates occurred in this iteration
+        }
+    }
+
+    // Find the farthest node from the source
+    int farthestNodeId = -1;
+    double maxDistance = 0.0;
+    for (int nodeId : Ids) {
+        double distance = dist[nodeId];
+        if (distance > maxDistance && distance != numeric_limits<double>::infinity()) {
+            maxDistance = distance;
+            farthestNodeId = nodeId;
+        }
+    }
+
+    return {farthestNodeId, maxDistance};
 }
+*/
+
+pair<int, double> bellman_ford(int ID, const unordered_map<int, Node>& graph) {
+    unordered_map<int, double> distanceMap;
+    vector<int> nodeIDs;
+
+    // Initialize distances to all nodes as infinity and collect node IDs
+    for (auto it = graph.begin(); it != graph.end(); ++it) {
+        int nodeID = it->first;
+        nodeIDs.push_back(nodeID);
+        distanceMap[nodeID] = numeric_limits<double>::infinity();
+    }
+    distanceMap[ID] = 0.0;  // Distance to the source is zero
+
+    int size = graph.size();
+
+    for (int i = 0; i < size - 1; i++) {
+        bool updated = false;
+        for (auto it = graph.begin();it!= graph.end(); it++) {
+            int currentNode= it->first;
+            vector<pair<int, double>> neighbors= it->second.neighbors;
+            for (auto neighbor = neighbors.begin(); neighbor != neighbors.end(); neighbor++) {
+                int neighborID = neighbor->first;
+                double edgeWeight = neighbor->second;
+                if (distanceMap[currentNode] != numeric_limits<double>::infinity() && distanceMap[currentNode] + edgeWeight < distanceMap[neighborID]) {
+                    distanceMap[neighborID] = distanceMap[currentNode] + edgeWeight;
+                    updated = true;
+                }
+            }
+        }
+        if (!updated) {
+            break; // Early termination if no updates occurred in this iteration
+        }
+    }
+
+    // Find the farthest node from the source
+    int farthestNodeID = -1;
+    double maxDistance = 0.0;
+    for (auto it = nodeIDs.begin(); it != nodeIDs.end(); ++it) {
+        int nodeID = *it;
+        double distance = distanceMap[nodeID];
+        if (distance > maxDistance && distance != numeric_limits<double>::infinity()) {
+            maxDistance = distance;
+            farthestNodeID = nodeID;
+        }
+    }
+
+    return {farthestNodeID, maxDistance};
+}
+
 
 int main() {
     string csvFile = "../data/openchargemap_data.csv";
@@ -352,7 +450,7 @@ int main() {
             cout << "\nMenu:" << endl;
             cout << "1. Change state" << endl;
             cout << "2. Find best location for new node using Dijkstra's algorithm" << endl;
-            cout << "3. Find best location for new node using A* Search Algorithm" << endl;
+            cout << "3. Find best location for new node using Bellman Ford's Algorithm" << endl;
             cout << "4. Exit" << endl;
             cout << "Enter your choice: ";
             int choice;
@@ -401,8 +499,9 @@ int main() {
                 if (nodes.empty()) {
                     cout << "No nodes available in the graph!" << endl;
                 }
-                else{
+                else {
                     int sourceID = -1;
+                    // Find a suitable source node with neighbors
                     for (int i = 0; i < nodes.size(); i++) {
                         if (!graph.at(nodes[i].id).neighbors.empty()) {
                             sourceID = nodes[i].id;
@@ -415,10 +514,10 @@ int main() {
                     }
 
                     cout << "Using source node: " << sourceID << endl;
-                    pair<int, double> result = aStarAlg(sourceID, graph);
+                    pair<int, double> result = bellman_ford(sourceID, graph);
                     if (result.first != -1) {
-                        cout << "The farthest node from node " << sourceID << " is node " << result.first << " with a distance of " << result.second  << " km." << endl;
-
+                        cout << "The farthest node from node " << sourceID << " is node " << result.first
+                             << " with a distance of " << result.second << " km." << endl;
                     }
                     else {
                         cout << "No reachable nodes found from the source node." << endl;

@@ -1,4 +1,3 @@
-ToolSet: 6.0 w64 (local)@C:\mingw64
-Options: 
+ToolSet: 1.0 (local)Options: 
 
-Options:
+Options:-DCMAKE_CXX_COMPILER=c++
