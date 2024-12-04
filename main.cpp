@@ -5,7 +5,6 @@
 #include <cmath>
 #include <queue>
 #include <unordered_map>
-#include <unordered_set>
 #include <algorithm>
 #include <chrono>
 
@@ -42,7 +41,7 @@ struct Node {
 void buildGraph(const vector<Node>& nodes, double thresholdDistance, unordered_map<int, Node>& graph) {
     int numNodes = nodes.size();
     int edgeCount = 0;
-    cout << "Building graph with threshold distance: " << thresholdDistance << " km" << endl;
+    cout << "Building graph... (threshold: " << thresholdDistance << " km)" << endl;
 
     for (int i = 0; i < numNodes; i++) {
         Node node = nodes[i];
@@ -93,7 +92,6 @@ pair<int, double> dijkstra_alg(int Id, const unordered_map<int, Node>& graph) {
         dist[node] = numeric_limits<double>::infinity();
     }
     dist[Id] = 0.0;
-
     priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
     pq.push({0.0, Id});
     while (!pq.empty()) {
@@ -129,7 +127,6 @@ pair<int, double> dijkstra_alg(int Id, const unordered_map<int, Node>& graph) {
     return {farthestNodeId, maxDistance};
 }
 
-
 pair<int, double> bellman_ford(int ID, const unordered_map<int, Node>& graph) {
     unordered_map<int, double> distanceMap;
     vector<int> nodeIDs;
@@ -140,7 +137,7 @@ pair<int, double> bellman_ford(int ID, const unordered_map<int, Node>& graph) {
         nodeIDs.push_back(nodeID);
         distanceMap[nodeID] = numeric_limits<double>::infinity();
     }
-    distanceMap[ID] = 0.0;  // Distance to the source is zero
+    distanceMap[ID] = 0.0;
 
     int size = graph.size();
 
@@ -159,7 +156,7 @@ pair<int, double> bellman_ford(int ID, const unordered_map<int, Node>& graph) {
             }
         }
         if (!updated) {
-            break; // Early termination if no updates occurred in this iteration
+            break;
         }
     }
 
@@ -178,62 +175,128 @@ pair<int, double> bellman_ford(int ID, const unordered_map<int, Node>& graph) {
     return {farthestNodeID, maxDistance};
 }
 
-//pair<int, double> aStarAlg(int startID, unordered_map<int, Node>& graph ) {
-//    unordered_map<int, double> costFromStart;
-//    unordered_map<int, double> totalCost;
-//
-//    for (auto it = graph.begin(); it != graph.end(); ++it) {
-//        int nodeId = it->first;
-//        costFromStart[nodeId] = numeric_limits<double>::infinity();
-//        totalCost[nodeId] = numeric_limits<double>::infinity();
-//    }
-//    costFromStart[startID] = 0.0;
-//    totalCost[startID] = 0.0;
-//    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
-//    pq.push({0.0, startID});
-//
-//    int farthestNode = -1;
-//    double maxDistance = 0;
-//
-//    while (!pq.empty()) {
-//        pair<double, int> top = pq.top();
-//        double currDist = top.first;
-//        int currNode = top.second;
-//        pq.pop();
-//
-//        if (currDist > totalCost[currNode]) {
-//            continue;
-//        }
-//
-//        vector<pair<int, double>> &neighbors = graph[currNode].neighbors;
-//        for (size_t i = 0; i < neighbors.size(); i++) {
-//            int neighborsID = neighbors[i].first;
-//            double edgeWeight = neighbors[i].second;
-//            double newDistance = costFromStart[currNode] + edgeWeight;
-//            double heuristic = haversine(graph[neighborsID].latitude, graph[neighborsID].longitude,
-//                                         graph[startID].latitude, graph[startID].longitude);
-//
-//            if (newDistance < costFromStart[neighborsID]) {
-//                costFromStart[neighborsID] = newDistance;
-//                totalCost[neighborsID] = newDistance + heuristic;
-//                pq.push(pair<double, int>(totalCost[neighborsID], neighborsID));
-//                if (newDistance > maxDistance) {
-//                    maxDistance = newDistance;
-//                    farthestNode = neighborsID;
-//                }
-//
-//            }
-//        }
-//    }
-//    if (farthestNode == -1) {
-//        return pair<int, double>(-1, numeric_limits<double>::infinity());
-//    }
-//
-//    return pair<int, double>(farthestNode, maxDistance);
-//}
+vector<int> runDijkstras(const vector<Node>& nodes, const unordered_map<int, Node>& graph, const vector<Node>& newlyAdded, string inputS) {
+    if (nodes.empty()) {
+        cout << "No nodes." << endl;
+        return {-1, -1};
+    } else {
+        int sourceId = -1;
+        for (int i = 0; i < nodes.size(); ++i) {
+            if (!graph.at(nodes[i].id).neighbors.empty()) {
+                sourceId = nodes[i].id;
+                break;
+            }
+        }
+        if (sourceId == -1) {
+            cout << "No suitable source." << endl;
+            return {-1, -1};
+        }
 
+        //if already added in this state
+        if(newlyAdded.size() > 0) {
+            for (int i = newlyAdded.size() - 1; i >= 0; i--) {
+                if (newlyAdded[i].stateOrProvince == inputS) {
+                    sourceId = newlyAdded[i].id;
+                    break;
+                }
+            }
+        }
+        cout << "Using source node: " << sourceId << endl;
+
+        // Start timer
+        auto start = chrono::high_resolution_clock::now();
+
+        pair<int, double> result = dijkstra_alg(sourceId, graph);
+        // End timer
+        auto end = chrono::high_resolution_clock::now();
+
+        // Calculate duration in nanoseconds
+        auto duration = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+        cout << "Dijkstra's algorithm took " << duration << " nanoseconds." << endl;
+
+        // Display the results
+        if (result.first != -1) {
+            cout << "The farthest node from node " << sourceId
+                 << " is node " << result.first
+                 << " with a distance of " << result.second << " km." << endl;
+
+            return {sourceId, result.first};
+        } else {
+            cout << "No reachable nodes found from the source node." << endl;
+            return {-1, -1};
+        }
+    }
+}
+
+vector<int> runBellmanFord(const vector<Node>& nodes, const unordered_map<int, Node>& graph, const vector<Node>& newlyAdded, const string& inputS) {
+    if (nodes.empty()) {
+        cout << "No nodes." << endl;
+        return {-1, -1};
+    } else {
+        int sourceID = -1;
+
+        for (int i = 0; i < nodes.size(); i++) {
+            if (!graph.at(nodes[i].id).neighbors.empty()) {
+                sourceID = nodes[i].id;
+                break;
+            }
+        }
+        if (sourceID == -1) {
+            cout << "No suitable source node." << endl;
+            return {-1, -1};
+        }
+
+        if(newlyAdded.size() > 0) {
+            for (int i = newlyAdded.size() - 1; i >= 0; i--) {
+                if (newlyAdded[i].stateOrProvince == inputS) {
+                    sourceID = newlyAdded[i].id;
+                    break;
+                }
+            }
+        }
+
+        cout << "Using source node: " << sourceID << endl;
+
+        // Start timer
+        auto start = chrono::high_resolution_clock::now();
+
+        pair<int, double> result = bellman_ford(sourceID, graph);
+
+        // End timer after function is called
+        auto end = chrono::high_resolution_clock::now();
+
+        // Calculate duration in nanoseconds
+        auto duration = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+        cout << "Bellman-Ford algorithm took " << duration << " nanoseconds." << endl;
+
+        // Display the results
+        if (result.first != -1) {
+            cout << "The farthest node from node " << sourceID << " is node " << result.first
+                 << " with a distance of " << result.second << " km." << endl;
+            // Return sourceID and farthest node ID as a vector
+            return {sourceID, result.first};
+        } else {
+            cout << "No reachable nodes found from the source node." << endl;
+            return {-1, -1};
+        }
+    }
+}
+
+vector<double> cMidpoint(const Node& one, const Node& two){
+    double oneLat = one.latitude;
+    double oneLon = one.longitude;
+    double twoLat = two.latitude;
+    double twoLon = two.longitude;
+    double avgx = (oneLat + twoLat)/2;
+    double avgy = (oneLon + twoLon)/2;
+    vector<double> result;
+    result.push_back(avgx);
+    result.push_back(avgy);
+    return result;
+}
 
 int main() {
+
     string csvFile = "../data/openchargemap_data.csv";
     ifstream file(csvFile);
     string line;
@@ -248,29 +311,35 @@ int main() {
 
     vector<Node> allNodes;
     unordered_map<int, Node> graph;
+    vector<Node> newlyAdded;
 
     //skip header since its column headers
     getline(file, line);
 
     int nodeId = 0;
 
-    // Set of U.S. state abbreviations
-    unordered_set<string> usStates = {
-            "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
-            "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
-            "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
-            "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
-            "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
-            // Include full state names if necessary
-            "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida",
-            "Georgia",
-            "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",
-            "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada",
-            "New Hampshire", "New Jersey",
-            "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania",
-            "Rhode Island", "South Carolina",
-            "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
-            "Wisconsin", "Wyoming"
+    unordered_map<string, string> stateToAbbreviation = {
+            // Full names
+            {"ALABAMA", "AL"}, {"ALASKA", "AK"}, {"ARIZONA", "AZ"}, {"ARKANSAS", "AR"}, {"CALIFORNIA", "CA"},
+            {"COLORADO", "CO"}, {"CONNECTICUT", "CT"}, {"DELAWARE", "DE"}, {"FLORIDA", "FL"}, {"GEORGIA", "GA"},
+            {"HAWAII", "HI"}, {"IDAHO", "ID"}, {"ILLINOIS", "IL"}, {"INDIANA", "IN"}, {"IOWA", "IA"},
+            {"KANSAS", "KS"}, {"KENTUCKY", "KY"}, {"LOUISIANA", "LA"}, {"MAINE", "ME"}, {"MARYLAND", "MD"},
+            {"MASSACHUSETTS", "MA"}, {"MICHIGAN", "MI"}, {"MINNESOTA", "MN"}, {"MISSISSIPPI", "MS"}, {"MISSOURI", "MO"},
+            {"MONTANA", "MT"}, {"NEBRASKA", "NE"}, {"NEVADA", "NV"}, {"NEW HAMPSHIRE", "NH"}, {"NEW JERSEY", "NJ"},
+            {"NEW MEXICO", "NM"}, {"NEW YORK", "NY"}, {"NORTH CAROLINA", "NC"}, {"NORTH DAKOTA", "ND"},
+            {"OHIO", "OH"}, {"OKLAHOMA", "OK"}, {"OREGON", "OR"}, {"PENNSYLVANIA", "PA"}, {"RHODE ISLAND", "RI"},
+            {"SOUTH CAROLINA", "SC"}, {"SOUTH DAKOTA", "SD"}, {"TENNESSEE", "TN"}, {"TEXAS", "TX"}, {"UTAH", "UT"},
+            {"VERMONT", "VT"}, {"VIRGINIA", "VA"}, {"WASHINGTON", "WA"}, {"WEST VIRGINIA", "WV"}, {"WISCONSIN", "WI"},
+            {"WYOMING", "WY"},
+            // Abbreviations mapped to themselves for easier lookup
+            {"AL", "AL"}, {"AK", "AK"}, {"AZ", "AZ"}, {"AR", "AR"}, {"CA", "CA"}, {"CO", "CO"}, {"CT", "CT"},
+            {"DE", "DE"}, {"FL", "FL"}, {"GA", "GA"}, {"HI", "HI"}, {"ID", "ID"}, {"IL", "IL"}, {"IN", "IN"},
+            {"IA", "IA"}, {"KS", "KS"}, {"KY", "KY"}, {"LA", "LA"}, {"ME", "ME"}, {"MD", "MD"}, {"MA", "MA"},
+            {"MI", "MI"}, {"MN", "MN"}, {"MS", "MS"}, {"MO", "MO"}, {"MT", "MT"}, {"NE", "NE"}, {"NV", "NV"},
+            {"NH", "NH"}, {"NJ", "NJ"}, {"NM", "NM"}, {"NY", "NY"}, {"NC", "NC"}, {"ND", "ND"}, {"OH", "OH"},
+            {"OK", "OK"}, {"OR", "OR"}, {"PA", "PA"}, {"RI", "RI"}, {"SC", "SC"}, {"SD", "SD"}, {"TN", "TN"},
+            {"TX", "TX"}, {"UT", "UT"}, {"VT", "VT"}, {"VA", "VA"}, {"WA", "WA"}, {"WV", "WV"}, {"WI", "WI"},
+            {"WY", "WY"}
     };
 
     // process each section of data
@@ -316,11 +385,16 @@ int main() {
             double latitude = stod(row[9]);
             double longitude = stod(row[10]);
 
-            // Extract stateOrProvince
+            // Extract stateOrProvince and normalize to abbreviation
             string stateOrProvince = row[6];
+            transform(stateOrProvince.begin(), stateOrProvince.end(), stateOrProvince.begin(), ::toupper);
+
+            if (stateToAbbreviation.find(stateOrProvince) != stateToAbbreviation.end()) {
+                stateOrProvince = stateToAbbreviation[stateOrProvince];
+            }
 
             // Check if the stateOrProvince is a U.S. state
-            if (usStates.find(stateOrProvince) != usStates.end()) {
+            if (stateToAbbreviation.find(stateOrProvince) != stateToAbbreviation.end()) {
                 // Create a node and add it to the list
                 Node node;
                 node.id = nodeId++;
@@ -348,20 +422,28 @@ int main() {
 
     // Prompt the user for the U.S. state
     string inputState;
-    cout << "Enter the U.S. state you would like the stations in (e.g., 'CA' or 'California'): ";
+    cout << "Enter the U.S. state you would like the stations in (e.g., 'CA' or 'California'): " << endl;
     getline(cin, inputState);
 
     bool running = true;
 
     while (running) {
-        // Convert input to uppercase for comparison (for state abbreviations)
-        string inputStateUpper = inputState;
-        transform(inputStateUpper.begin(), inputStateUpper.end(), inputStateUpper.begin(), ::toupper);
 
-        // Convert input to title case for comparison (for state names)
-        string inputStateTitle = inputState;
-        transform(inputStateTitle.begin(), inputStateTitle.begin() + 1, inputStateTitle.begin(), ::toupper);
-        transform(inputStateTitle.begin() + 1, inputStateTitle.end(), inputStateTitle.begin() + 1, ::tolower);
+        // Normalize input state to abbreviation
+        transform(inputState.begin(), inputState.end(), inputState.begin(), ::toupper);
+
+        // Check if the input is a full state name
+        if (stateToAbbreviation.find(inputState) != stateToAbbreviation.end()) {
+            inputState = stateToAbbreviation[inputState]; // Convert to abbreviation
+        }
+
+        // Validate if inputState is now a valid U.S. state abbreviation
+        if (stateToAbbreviation.find(inputState) == stateToAbbreviation.end()) {
+            cout << "Invalid state, enter a US state:" << endl;
+            getline(cin, inputState);
+            continue;
+        }
+
 
         // Clear previous graph and nodes for old state
         graph.clear();
@@ -371,7 +453,7 @@ int main() {
         for (const auto &node: allNodes) {
             string nodeState = node.stateOrProvince;
 
-            if (nodeState == inputStateUpper || nodeState == inputStateTitle) {
+            if (node.stateOrProvince == inputState) {
                 nodes.push_back(node);
                 graph[node.id] = node;
             }
@@ -380,7 +462,7 @@ int main() {
         if (nodes.empty()) {
             cout << "No stations found in the specified state: " << inputState << endl;
             // Prompt for a new state
-            cout << "Enter the U.S. state you would like the stations in (e.g., 'CA' or 'California'): ";
+            cout << "Enter the U.S. state you would like the stations in (e.g., 'CA' or 'California'): " << endl;
             getline(cin, inputState);
             continue;
         }
@@ -390,16 +472,13 @@ int main() {
             return 1;
         }
 
-        cout << "Number of stations in " << inputState << ": " << nodes.size() << endl;
+        cout << "\nNumber of stations in " << inputState << ": " << nodes.size() << endl;
 
         double thresholdDistance = 2.0;
 
         // Build the graph
-        cout << "Building graph..." << endl;
         buildGraph(nodes, thresholdDistance, graph);
         cout << "Graph built successfully!" << endl;
-        cout << "Number of nodes: " << nodes.size() << endl;
-
 
         // User menu
         while (true) {
@@ -407,98 +486,158 @@ int main() {
             cout << "1. Change state" << endl;
             cout << "2. Find best location for new node using Dijkstra's algorithm" << endl;
             cout << "3. Find best location for new node using Bellman Ford's Algorithm" << endl;
-            cout << "4. Exit" << endl;
-            cout << "Enter your choice: ";
+            cout << "4. Place a new optimized station(node) in the graph using an Algorithm" << endl;
+            cout << "5. Exit" << endl;
+            cout << "Enter your choice: " << endl;
+
+
+            string choice1;
+            cin >> choice1;
             int choice;
-            cin >> choice;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear input buffer
+
+            //input validation
+            try {
+                choice = stoi(choice1);
+            } catch (const invalid_argument&) {
+                cout << "Invalid input. Please enter a number between 1 and 5." << endl;
+                continue;
+            }
 
             if (choice == 1) {
                 // Change state
-                cout << "Enter the U.S. state you would like the stations in (e.g., 'CA' or 'California'): ";
+                cout << "Enter the U.S. state you would like the stations in (e.g., 'CA' or 'California'): " << endl;
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 getline(cin, inputState);
                 // Break inner loop to rebuild graph with new state
                 break;
             } else if (choice == 2) {
-                if (nodes.empty()) {
-                    cout << "No nodes available in the graph!" << endl;
-                } else {
-                    int sourceId = -1;
-                    for (int i = 0; i < nodes.size(); ++i) {
-                        if (!graph.at(nodes[i].id).neighbors.empty()) {
-                            sourceId = nodes[i].id;
-                            break;
+                runDijkstras(nodes, graph, newlyAdded, inputState);
+            }
+            else if (choice == 3) {
+                runBellmanFord(nodes, graph, newlyAdded, inputState);
+            }
+            else if(choice == 4){
+                cout << "\nWhich algorithm would you like to use?" << endl;
+                cout << "1. Dijkstra's" << endl;
+                cout << "2. Bellman Ford" << endl;
+                cout << "Enter your choice: " << endl;
+                string choice1;
+                cin >> choice1;
+                int choice2;
+
+                //input validation
+                try {
+                    choice2 = stoi(choice1);
+                } catch (const invalid_argument&) {
+                    cout << "Invalid input. Please enter a number between 1 and 5." << endl;
+                    continue;
+                }
+
+
+                if(choice2 == 1){
+                    vector<int> values = runDijkstras(nodes, graph, newlyAdded, inputState);
+                    int source = values[0];
+                    int farthest = values[1];
+                    if (source != -1 && farthest != -1) {
+                        if (graph.find(source) != graph.end() && graph.find(farthest) != graph.end()) {
+                            Node sourceNode = graph.find(source)->second;
+                            Node farthestNode = graph.find(farthest)->second;
+                            vector<double> midpoint = cMidpoint(sourceNode, farthestNode);
+                            cout << "New Station Location Added! (midpoint):" << endl;
+                            cout << "Latitude: " << midpoint[0] << ", Longitude: " << midpoint[1] << endl;
+                            Node add;
+                            add.latitude = midpoint[0];
+                            add.longitude = midpoint[1];
+                            add.id = allNodes.size();
+                            add.stateOrProvince = inputState;
+                            allNodes.push_back(add);
+                            newlyAdded.push_back(add);
+
+                            // Clear previous graph and nodes for old state
+                            graph.clear();
+                            vector<Node> nodes;
+
+                            // Filter nodes based on the input state
+                            for (const auto &node: allNodes) {
+                                string nodeState = node.stateOrProvince;
+
+                                if (node.stateOrProvince == inputState) {
+                                    nodes.push_back(node);
+                                    graph[node.id] = node;
+                                }
+                            }
+
+                            cout << "\nNumber of stations in " << inputState << ": " << nodes.size() << endl;
+
+                            thresholdDistance = 2.0;
+
+                            // Build the graph
+                            buildGraph(nodes, thresholdDistance, graph);
+                            cout << "Graph built successfully!" << endl;
+                        }
+                        else{
+                            cout << "Not in graph" << endl;
                         }
                     }
-                    if (sourceId == -1) {
-                        cout << "No suitable source node with neighbors found!" << endl;
-                        return 0;
-                    }
-
-                    cout << "Using source node: " << sourceId << endl;
-
-                    // start timer
-                    auto start = chrono::high_resolution_clock::now();
-
-                    // Call the updated Dijkstra's function
-                    pair<int, double> result = dijkstra_alg(sourceId, graph);
-
-                    // end timer after function is called
-                    auto end = chrono::high_resolution_clock::now();
-
-                    auto duration = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
-                    cout << "Dijkstra's algorithm took " << duration << " nanoseconds." << endl;
-
-                    // Display the results
-                    if (result.first != -1) {
-                        cout << "The farthest node from node " << sourceId
-                             << " is node " << result.first
-                             << " with a distance of " << result.second << " km." << endl;
-                    } else {
-                        cout << "No reachable nodes found from the source node." << endl;
-                    }
                 }
-            } else if (choice == 3) {
-                if (nodes.empty()) {
-                    cout << "No nodes available in the graph!" << endl;
-                } else {
-                    int sourceID = -1;
-                    // Find a suitable source node with neighbors
-                    for (int i = 0; i < nodes.size(); i++) {
-                        if (!graph.at(nodes[i].id).neighbors.empty()) {
-                            sourceID = nodes[i].id;
-                            break;
+                else if(choice2 == 2) {
+                    vector<int> values = runBellmanFord(nodes, graph, newlyAdded, inputState);
+                    int source = values[0];
+                    int farthest = values[1];
+                    if (source != -1 && farthest != -1) {
+                        if (graph.find(source) != graph.end() && graph.find(farthest) != graph.end()) {
+                            Node sourceNode = graph.find(source)->second;
+                            Node farthestNode = graph.find(farthest)->second;
+                            vector<double> midpoint = cMidpoint(sourceNode, farthestNode);
+                            cout << "Suggested location (midpoint):" << endl;
+                            cout << "Latitude: " << midpoint[0] << ", Longitude: " << midpoint[1] << endl;
+                            Node add;
+                            add.latitude = midpoint[0];
+                            add.longitude = midpoint[1];
+                            add.id = allNodes.size();
+                            add.stateOrProvince = inputState;
+                            allNodes.push_back(add);
+                            newlyAdded.push_back(add);
+
+                            // Clear previous graph and nodes for old state
+                            graph.clear();
+                            vector<Node> nodes;
+
+                            // Filter nodes based on the input state
+                            for (const auto &node: allNodes) {
+                                string nodeState = node.stateOrProvince;
+
+                                if (node.stateOrProvince == inputState) {
+                                    nodes.push_back(node);
+                                    graph[node.id] = node;
+                                }
+                            }
+
+                            cout << "Number of stations in " << inputState << ": " << nodes.size() << endl;
+
+                            thresholdDistance = 2.0;
+
+                            // Build the graph
+                            buildGraph(nodes, thresholdDistance, graph);
+                            cout << "Graph built successfully!" << endl;
+                        }
+                        else{
+                            cout << "Not in graph" << endl;
                         }
                     }
-                    if (sourceID == -1) {
-                        cout << "No suitable source node with neighbors found!" << endl;
-                        return 0;
-                    }
-
-                    cout << "Using source node: " << sourceID << endl;
-                    // start timer
-                    auto start = chrono::high_resolution_clock::now();
-
-                    pair<int, double> result = bellman_ford(sourceID, graph);
-
-                    // end timer after function called
-                    auto end = chrono::high_resolution_clock::now();
-                    auto duration = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
-                    cout << "Bellman-Ford algorithm took " << duration << " nanoseconds." << endl;
-                    if (result.first != -1) {
-                        cout << "The farthest node from node " << sourceID << " is node " << result.first
-                             << " with a distance of " << result.second << " km." << endl;
-                    } else {
-                        cout << "No reachable nodes found from the source node." << endl;
-                    }
                 }
-            } else if (choice == 4) {
+                else {
+                    cout << "Choose valid option" << endl;
+                }
+            }
+            else if (choice == 5) {
                 // Exit
                 running = false;
                 cout << "Exiting" << endl;
                 break;
             } else {
-                cout << "Invalid choice. Please enter 1, 2, or 3." << endl;
+                //fix
+                cout << "Invalid choice. Please enter 1, 2, 3, 4, or 5." << endl;
             }
         }
     }

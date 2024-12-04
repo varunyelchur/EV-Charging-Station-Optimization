@@ -52,10 +52,10 @@ RM = "C:\Program Files\JetBrains\CLion 2023.3.2\bin\cmake\win\x64\bin\cmake.exe"
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization"
+CMAKE_SOURCE_DIR = C:\Users\jakes\Downloads\EV-Charging-Station-Optimization
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization\cmake-build-debug"
+CMAKE_BINARY_DIR = C:\Users\jakes\Downloads\EV-Charging-Station-Optimization\cmake-build-debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/EV_Charging_Station_Optimization.dir/depend.make
@@ -69,18 +69,18 @@ include CMakeFiles/EV_Charging_Station_Optimization.dir/progress.make
 include CMakeFiles/EV_Charging_Station_Optimization.dir/flags.make
 
 CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.obj: CMakeFiles/EV_Charging_Station_Optimization.dir/flags.make
-CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.obj: C:/Users/nickl/EV\ -Charging-Station-Optimization2/EV-Charging-Station-Optimization/main.cpp
+CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.obj: C:/Users/jakes/Downloads/EV-Charging-Station-Optimization/main.cpp
 CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.obj: CMakeFiles/EV_Charging_Station_Optimization.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.obj"
-	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.obj -MF CMakeFiles\EV_Charging_Station_Optimization.dir\main.cpp.obj.d -o CMakeFiles\EV_Charging_Station_Optimization.dir\main.cpp.obj -c "C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization\main.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\jakes\Downloads\EV-Charging-Station-Optimization\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.obj"
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.obj -MF CMakeFiles\EV_Charging_Station_Optimization.dir\main.cpp.obj.d -o CMakeFiles\EV_Charging_Station_Optimization.dir\main.cpp.obj -c C:\Users\jakes\Downloads\EV-Charging-Station-Optimization\main.cpp
 
 CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.i"
-	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization\main.cpp" > CMakeFiles\EV_Charging_Station_Optimization.dir\main.cpp.i
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\jakes\Downloads\EV-Charging-Station-Optimization\main.cpp > CMakeFiles\EV_Charging_Station_Optimization.dir\main.cpp.i
 
 CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/EV_Charging_Station_Optimization.dir/main.cpp.s"
-	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization\main.cpp" -o CMakeFiles\EV_Charging_Station_Optimization.dir\main.cpp.s
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\jakes\Downloads\EV-Charging-Station-Optimization\main.cpp -o CMakeFiles\EV_Charging_Station_Optimization.dir\main.cpp.s
 
 # Object files for target EV_Charging_Station_Optimization
 EV_Charging_Station_Optimization_OBJECTS = \
@@ -94,7 +94,7 @@ EV_Charging_Station_Optimization.exe: CMakeFiles/EV_Charging_Station_Optimizatio
 EV_Charging_Station_Optimization.exe: CMakeFiles/EV_Charging_Station_Optimization.dir/linkLibs.rsp
 EV_Charging_Station_Optimization.exe: CMakeFiles/EV_Charging_Station_Optimization.dir/objects1.rsp
 EV_Charging_Station_Optimization.exe: CMakeFiles/EV_Charging_Station_Optimization.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable EV_Charging_Station_Optimization.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\jakes\Downloads\EV-Charging-Station-Optimization\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable EV_Charging_Station_Optimization.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\EV_Charging_Station_Optimization.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -106,6 +106,6 @@ CMakeFiles/EV_Charging_Station_Optimization.dir/clean:
 .PHONY : CMakeFiles/EV_Charging_Station_Optimization.dir/clean
 
 CMakeFiles/EV_Charging_Station_Optimization.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization" "C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization" "C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization\cmake-build-debug" "C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization\cmake-build-debug" "C:\Users\nickl\EV -Charging-Station-Optimization2\EV-Charging-Station-Optimization\cmake-build-debug\CMakeFiles\EV_Charging_Station_Optimization.dir\DependInfo.cmake" "--color=$(COLOR)"
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\jakes\Downloads\EV-Charging-Station-Optimization C:\Users\jakes\Downloads\EV-Charging-Station-Optimization C:\Users\jakes\Downloads\EV-Charging-Station-Optimization\cmake-build-debug C:\Users\jakes\Downloads\EV-Charging-Station-Optimization\cmake-build-debug C:\Users\jakes\Downloads\EV-Charging-Station-Optimization\cmake-build-debug\CMakeFiles\EV_Charging_Station_Optimization.dir\DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/EV_Charging_Station_Optimization.dir/depend
 
