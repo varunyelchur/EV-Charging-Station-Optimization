@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <algorithm>
+#include <chrono>
 
 using namespace std;
 
@@ -128,108 +129,6 @@ pair<int, double> dijkstra_alg(int Id, const unordered_map<int, Node>& graph) {
     return {farthestNodeId, maxDistance};
 }
 
-// A* Search Algorithm
-/*pair<int, double> aStarAlg(int startID, unordered_map<int, Node>& graph ){
-    unordered_map<int, double> costFromStart;
-    unordered_map<int, double> totalCost;
-
-    for (auto it = graph.begin(); it != graph.end(); ++it) {
-        int nodeId = it->first;
-        costFromStart[nodeId] = numeric_limits<double>::infinity();
-        totalCost[nodeId] = numeric_limits<double>::infinity();
-    }
-    costFromStart[startID] = 0.0;
-    totalCost[startID] = 0.0;
-    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
-    pq.push({0.0, startID});
-
-    int farthestNode = -1;
-    double maxDistance = 0;
-
-    while (!pq.empty()) {
-        pair<double, int> top = pq.top();
-        double currDist = top.first;
-        int currNode = top.second;
-        pq.pop();
-
-        if (currDist > totalCost[currNode]) {
-            continue;
-        }
-
-        vector<pair<int, double>>& neighbors = graph[currNode].neighbors;
-        for(size_t i =0; i < neighbors.size(); i++){
-            int neighborsID = neighbors[i].first;
-            double edgeWeight = neighbors[i].second;
-            double newDistance = costFromStart[currNode] + edgeWeight;
-            double heuristic =  haversine(graph[neighborsID].latitude, graph[neighborsID].longitude, graph[startID].latitude, graph[startID].longitude);
-
-            if(newDistance< costFromStart[neighborsID]){
-                costFromStart[neighborsID] = newDistance;
-                totalCost[neighborsID] = newDistance + heuristic;
-                pq.push(pair<double, int>(totalCost[neighborsID], neighborsID));
-                if (newDistance > maxDistance) {
-                    maxDistance = newDistance;
-                    farthestNode = neighborsID;
-                }
-
-            }
-        }
-    }
-    if (farthestNode == -1) {
-        return pair<int, double>(-1, numeric_limits<double>::infinity());
-    }
-
-    return pair<int, double>(farthestNode, maxDistance);
-}*/
-/*
-pair<int, double> bellman_ford(int sourceId, const unordered_map<int, Node>& graph) {
-    unordered_map<int, double> dist;
-    vector<int> Ids;
-
-    // Initialize distances to all nodes as infinity and collect node IDs
-    for (const auto& it : graph) {
-        int nodeId = it.first;
-        Ids.push_back(nodeId);
-        dist[nodeId] = numeric_limits<double>::infinity();
-    }
-    dist[sourceId] = 0.0;  // Distance to the source is zero
-
-    int V = graph.size();
-
-    // Relax edges repeatedly (up to V - 1 times)
-    for (int i = 0; i < V - 1; ++i) {
-        bool updated = false;
-        for (const auto& it : graph) {
-            int u = it.first;
-            const auto& neighbors = it.second.neighbors;
-            for (const auto& neighbor : neighbors) {
-                int v = neighbor.first;
-                double weight = neighbor.second;
-                if (dist[u] != numeric_limits<double>::infinity() && dist[u] + weight < dist[v]) {
-                    dist[v] = dist[u] + weight;
-                    updated = true;
-                }
-            }
-        }
-        if (!updated) {
-            break; // Early termination if no updates occurred in this iteration
-        }
-    }
-
-    // Find the farthest node from the source
-    int farthestNodeId = -1;
-    double maxDistance = 0.0;
-    for (int nodeId : Ids) {
-        double distance = dist[nodeId];
-        if (distance > maxDistance && distance != numeric_limits<double>::infinity()) {
-            maxDistance = distance;
-            farthestNodeId = nodeId;
-        }
-    }
-
-    return {farthestNodeId, maxDistance};
-}
-*/
 
 pair<int, double> bellman_ford(int ID, const unordered_map<int, Node>& graph) {
     unordered_map<int, double> distanceMap;
@@ -279,6 +178,60 @@ pair<int, double> bellman_ford(int ID, const unordered_map<int, Node>& graph) {
     return {farthestNodeID, maxDistance};
 }
 
+//pair<int, double> aStarAlg(int startID, unordered_map<int, Node>& graph ) {
+//    unordered_map<int, double> costFromStart;
+//    unordered_map<int, double> totalCost;
+//
+//    for (auto it = graph.begin(); it != graph.end(); ++it) {
+//        int nodeId = it->first;
+//        costFromStart[nodeId] = numeric_limits<double>::infinity();
+//        totalCost[nodeId] = numeric_limits<double>::infinity();
+//    }
+//    costFromStart[startID] = 0.0;
+//    totalCost[startID] = 0.0;
+//    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
+//    pq.push({0.0, startID});
+//
+//    int farthestNode = -1;
+//    double maxDistance = 0;
+//
+//    while (!pq.empty()) {
+//        pair<double, int> top = pq.top();
+//        double currDist = top.first;
+//        int currNode = top.second;
+//        pq.pop();
+//
+//        if (currDist > totalCost[currNode]) {
+//            continue;
+//        }
+//
+//        vector<pair<int, double>> &neighbors = graph[currNode].neighbors;
+//        for (size_t i = 0; i < neighbors.size(); i++) {
+//            int neighborsID = neighbors[i].first;
+//            double edgeWeight = neighbors[i].second;
+//            double newDistance = costFromStart[currNode] + edgeWeight;
+//            double heuristic = haversine(graph[neighborsID].latitude, graph[neighborsID].longitude,
+//                                         graph[startID].latitude, graph[startID].longitude);
+//
+//            if (newDistance < costFromStart[neighborsID]) {
+//                costFromStart[neighborsID] = newDistance;
+//                totalCost[neighborsID] = newDistance + heuristic;
+//                pq.push(pair<double, int>(totalCost[neighborsID], neighborsID));
+//                if (newDistance > maxDistance) {
+//                    maxDistance = newDistance;
+//                    farthestNode = neighborsID;
+//                }
+//
+//            }
+//        }
+//    }
+//    if (farthestNode == -1) {
+//        return pair<int, double>(-1, numeric_limits<double>::infinity());
+//    }
+//
+//    return pair<int, double>(farthestNode, maxDistance);
+//}
+
 
 int main() {
     string csvFile = "../data/openchargemap_data.csv";
@@ -309,11 +262,15 @@ int main() {
             "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
             "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
             // Include full state names if necessary
-            "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+            "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida",
+            "Georgia",
             "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",
-            "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
-            "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
-            "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+            "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada",
+            "New Hampshire", "New Jersey",
+            "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania",
+            "Rhode Island", "South Carolina",
+            "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
+            "Wisconsin", "Wyoming"
     };
 
     // process each section of data
@@ -376,8 +333,7 @@ int main() {
                 // Skip nodes not in the U.S.
                 continue;
             }
-        }
-        else {
+        } else {
             cout << "Warning: Missing latitude/longitude in row ID: " << row[0] << endl;
         }
 
@@ -397,7 +353,7 @@ int main() {
 
     bool running = true;
 
-    while(running){
+    while (running) {
         // Convert input to uppercase for comparison (for state abbreviations)
         string inputStateUpper = inputState;
         transform(inputStateUpper.begin(), inputStateUpper.end(), inputStateUpper.begin(), ::toupper);
@@ -412,7 +368,7 @@ int main() {
         vector<Node> nodes;
 
         // Filter nodes based on the input state
-        for (const auto& node : allNodes) {
+        for (const auto &node: allNodes) {
             string nodeState = node.stateOrProvince;
 
             if (nodeState == inputStateUpper || nodeState == inputStateTitle) {
@@ -481,25 +437,31 @@ int main() {
 
                     cout << "Using source node: " << sourceId << endl;
 
+                    // start timer
+                    auto start = chrono::high_resolution_clock::now();
+
                     // Call the updated Dijkstra's function
                     pair<int, double> result = dijkstra_alg(sourceId, graph);
+
+                    // end timer after function is called
+                    auto end = chrono::high_resolution_clock::now();
+
+                    auto duration = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+                    cout << "Dijkstra's algorithm took " << duration << " nanoseconds." << endl;
 
                     // Display the results
                     if (result.first != -1) {
                         cout << "The farthest node from node " << sourceId
                              << " is node " << result.first
                              << " with a distance of " << result.second << " km." << endl;
-                    }
-                    else {
+                    } else {
                         cout << "No reachable nodes found from the source node." << endl;
                     }
                 }
-            }
-            else if (choice == 3) {
+            } else if (choice == 3) {
                 if (nodes.empty()) {
                     cout << "No nodes available in the graph!" << endl;
-                }
-                else {
+                } else {
                     int sourceID = -1;
                     // Find a suitable source node with neighbors
                     for (int i = 0; i < nodes.size(); i++) {
@@ -514,17 +476,23 @@ int main() {
                     }
 
                     cout << "Using source node: " << sourceID << endl;
+                    // start timer
+                    auto start = chrono::high_resolution_clock::now();
+
                     pair<int, double> result = bellman_ford(sourceID, graph);
+
+                    // end timer after function called
+                    auto end = chrono::high_resolution_clock::now();
+                    auto duration = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+                    cout << "Bellman-Ford algorithm took " << duration << " nanoseconds." << endl;
                     if (result.first != -1) {
                         cout << "The farthest node from node " << sourceID << " is node " << result.first
                              << " with a distance of " << result.second << " km." << endl;
-                    }
-                    else {
+                    } else {
                         cout << "No reachable nodes found from the source node." << endl;
                     }
                 }
-            }
-            else if (choice == 4) {
+            } else if (choice == 4) {
                 // Exit
                 running = false;
                 cout << "Exiting" << endl;
@@ -534,6 +502,5 @@ int main() {
             }
         }
     }
-
     return 0;
 }
