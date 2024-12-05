@@ -5,6 +5,9 @@ Varun Yelchur
 Jacob Schreck
 Nicholas Levy
 
+How to Run:
+Run the code, and the output will be in the console, with the features listed below.
+
 Problem:
 The problem that we are trying to solve is where exactly charging stations should be built for Electric Vehicles based on the location and amount of charging stations.
 
